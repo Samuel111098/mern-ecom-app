@@ -24,7 +24,6 @@ router.get('/products', list);
 router.get('/products/related/:productId', listRelated);
 router.get('/products/categories', listCategories);
 router.post('/products/by/search', listBySearch);
-//Photo route not working
 router.get('/product/photo/:productId', photo);
 
 router.param('userId', userById);
