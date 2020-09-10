@@ -9,6 +9,8 @@ const expressValidator = require('express-validator');
 //import routes
 const authRoutes = require('./Routes/auth');
 const userRoutes = require('./Routes/user');
+const categoryRoutes = require('./Routes/category');
+const productRoutes = require('./Routes/product');
 
 //app
 const app = express();
@@ -18,7 +20,8 @@ mongoose
 	.connect(process.env.DATABASE, {
 		useNewUrlParser: true,
 		useCreateIndex: true,
-		useUnifiedTopology: true
+		useUnifiedTopology: true,
+		useFindAndModify: false
 	})
 	.then(() => {
 		console.log('Database is connected!');
@@ -33,6 +36,8 @@ app.use(expressValidator());
 //Router middleware
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', categoryRoutes);
+app.use('/api', productRoutes);
 
 const port = process.env.PORT || 8000;
 
