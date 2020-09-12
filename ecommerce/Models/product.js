@@ -35,7 +35,7 @@ const productSchema = new mongoose.Schema(
 			data: Buffer,
 			contentType: String
 		},
-		Shipping: {
+		shipping: {
 			type: Boolean,
 			required: false
 		}
