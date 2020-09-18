@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
-import { getProducts, getBraintreeClientToken, processPayment } from './ApiCore';
+import { getProducts, getBraintreeClientToken, processPayment, createOrder } from './ApiCore';
 import { isAuthenticated } from '../auth/index';
 import { Link } from 'react-router-dom';
 import DropIn from 'braintree-web-drop-in-react';
@@ -47,6 +47,8 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
 		);
 	};
 
+	let deliveryAddress = data.address;
+
 	const buy = () => {
 		setData({ ...data, loading: true });
 		let nonce;
@@ -62,11 +64,19 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
 				};
 				processPayment(userId, token, paymentData)
 					.then((response) => {
-						setData({ ...data, success: response.success });
-						emptyCart(() => {
-							setRun(!run);
-							console.log('Payment Successful');
-							setData({ loading: false });
+						const createOrderData = {
+							products: products,
+							transaction_id: response.transaction.id,
+							amount: response.transaction.amount,
+							address: deliveryAddress
+						};
+
+						createOrder(userId, token, createOrderData).then((response) => {
+							emptyCart(() => {
+								setRun(!run);
+								console.log('Payment Successful');
+								setData({ loading: false, success: true });
+							});
 						});
 					})
 					.catch((error) => {
@@ -80,11 +90,24 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
 			});
 	};
 
+	const handleAddress = (event) => {
+		setData({ ...data, address: event.target.value });
+	};
+
 	const showDropIn = () => {
 		return (
 			<div onBlur={() => setData({ ...data, error: '' })}>
 				{data.clientToken !== null && products.length > 0 ? (
 					<div>
+						<div className='form-group mb-3'>
+							<label className='text-muted'>Delivery Address: </label>
+							<textarea
+								onChange={handleAddress}
+								className='form-control'
+								value={data.address}
+								placeholder='Enter your address here..'
+							/>
+						</div>
 						<DropIn
 							options={{
 								authorization: data.clientToken
