@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const Radiobox = ({ prices, handleFilters }) => {
 	const [ values, setValues ] = useState(0);
